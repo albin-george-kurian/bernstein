@@ -170,6 +170,73 @@ def derive_read_paths(journal_path: Path, worktree_root: Path) -> ReadPathSet:
     )
 
 
+@dataclass(frozen=True, slots=True)
+class TaskReadSet:
+    """One task's read set, derived from its journal and nothing else.
+
+    The receipt projection is compared byte for byte, so both path fields are
+    sorted tuples rather than the :class:`ReadPathSet` frozensets they come
+    from: a set has no order to serialise, and two runs that read the same
+    files must project identically.
+
+    There is deliberately no constructor parameter through which a caller
+    could supply paths. The only way to obtain one of these is
+    :func:`derive_task_read_set`, which reads the journal itself -- so a task
+    that is wrong about what it read cannot put that claim into a receipt.
+
+    Attributes:
+        task_id: The task the set belongs to.
+        read_paths: Worktree-relative POSIX paths the run read, sorted.
+        out_of_tree: Absolute POSIX paths read outside the worktree root,
+            sorted. Carried rather than dropped: a read reaching outside the
+            tree is exactly what an integration-time check wants to see.
+    """
+
+    task_id: str
+    read_paths: tuple[str, ...]
+    out_of_tree: tuple[str, ...]
+
+    def to_dict(self) -> dict[str, object]:
+        """Canonical mapping for the receipt projection."""
+        return {
+            "task_id": self.task_id,
+            "read_paths": list(self.read_paths),
+            "out_of_tree": list(self.out_of_tree),
+        }
+
+
+def derive_task_read_set(task_id: str, journal_path: Path, worktree_root: Path) -> TaskReadSet:
+    """Derive *task_id*'s read set from its journal.
+
+    Thin task-scoped wrapper over :func:`derive_read_paths`: it adds the task
+    id and the canonical ordering the receipt needs, and adds nothing else.
+    In particular it inherits the fail-closed contract -- a journal that is
+    missing, empty, unreadable or whose chain does not verify raises rather
+    than yielding a smaller set. A trimmed read set would silently weaken
+    every check built on top of it.
+
+    Args:
+        task_id: The task whose journal is being read.
+        journal_path: Path to that task's ``journal.jsonl``. Derive it with
+            ``checkpoint_retry.task_journal_path`` rather than by hand, so a
+            crafted task id cannot address a journal outside the runs root.
+        worktree_root: Repository root the task was scoped to.
+
+    Returns:
+        The task's read set in canonical (sorted) form.
+
+    Raises:
+        ReadPathDerivationError: The journal could not be used as a source.
+            ``reason`` distinguishes the cases.
+    """
+    derived = derive_read_paths(journal_path, worktree_root)
+    return TaskReadSet(
+        task_id=task_id,
+        read_paths=tuple(sorted(derived.read_paths)),
+        out_of_tree=tuple(sorted(derived.out_of_tree)),
+    )
+
+
 def _posix(path: str) -> str:
     """Render a normalized local path in POSIX form (``/`` separators)."""
     return path.replace(os.sep, "/")
