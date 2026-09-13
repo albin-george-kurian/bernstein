@@ -9,8 +9,9 @@ This module is slice 1 of #5435: **detection only**. ``bernstein adopt
 and the files adoption would write -- and writes nothing. Running without
 ``--dry-run`` is refused with its own exit code rather than half-performed.
 The files reported are ``bernstein init``'s own plan
-(:func:`bernstein.cli.run_bootstrap.plan_init_writes`), so the dry run cannot
-describe a different workspace from the one init would build.
+(:func:`bernstein.cli.run_bootstrap.plan_init_writes`), and the tests hold
+init to it in both directions: every planned path exists after a real init,
+and init writes no path the plan does not name.
 
 The detection table is data
 ---------------------------
@@ -62,6 +63,16 @@ interpreter whose script is not named after the agent (``node .../cli.js``)
 is invisible to it and can only be found at the ``config`` tier. Ancestry is
 read with ``psutil`` when it is installed, from ``/proc`` on Linux otherwise,
 and is empty elsewhere -- in which case only the ``config`` tier can match.
+
+On the ``/proc`` path the name comes from ``stat``'s ``comm`` field, which the
+kernel truncates to 15 characters; the full binary name is recovered from
+``argv[0]`` in ``cmdline``. A process that has cleared its argv leaves only
+the truncated name, so an agent binary longer than 15 characters is not
+covered there. None of the five binaries in the table is that long today.
+
+``~/.claude`` exists on nearly every machine that has run Claude Code, so
+when no session is visible the ``config`` tier usually names ``claude``. That
+makes the interpreter blind spot above the common case, not the edge case.
 """
 
 from __future__ import annotations

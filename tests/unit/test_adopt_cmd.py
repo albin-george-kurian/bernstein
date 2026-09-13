@@ -26,7 +26,7 @@ import pytest
 from click.testing import CliRunner
 
 from bernstein.cli.commands import adopt_cmd as adopt
-from bernstein.cli.run_bootstrap import PLAN_CREATE, PLAN_EXISTS, init, plan_init_writes
+from bernstein.cli.run_bootstrap import INIT_TEMPLATES_DIR, PLAN_CREATE, PLAN_EXISTS, init, plan_init_writes
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -299,6 +299,26 @@ def test_the_plan_is_init_s_own_plan(tmp_path: Path) -> None:
 
     assert result.exit_code == 0, result.output
     assert {write.action for write in plan_init_writes(root)} == {PLAN_EXISTS}
+
+
+def test_init_writes_no_path_its_plan_does_not_name(tmp_path: Path) -> None:
+    """The other direction: a write added to init without a plan row fails here.
+
+    Only the templates entry may have contents of its own, because init copies
+    the bundled tree wholesale. Anything else under ``.sdd/`` has to be named,
+    so a new file there cannot hide behind its planned parent directory.
+    """
+    root = tmp_path / "workspace"
+    root.mkdir()
+    planned = {write.path for write in plan_init_writes(root)}
+
+    result = CliRunner().invoke(init, ["--dir", str(root)])
+
+    assert result.exit_code == 0, result.output
+    unplanned = [
+        path for path in _snapshot(root) if path not in planned and not path.startswith(f"{INIT_TEMPLATES_DIR}/")
+    ]
+    assert unplanned == []
 
 
 def test_adopt_is_registered_on_the_top_level_cli() -> None:

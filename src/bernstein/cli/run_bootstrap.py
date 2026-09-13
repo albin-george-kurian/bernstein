@@ -835,8 +835,9 @@ def _generate_default_yaml(project_type: str) -> str:
 
 # Workspace paths ``bernstein init`` writes, relative to the directory it
 # initialises. ``_init_impl`` writes them and :func:`plan_init_writes` reports
-# them, both through these names, so a dry run (``bernstein adopt --dry-run``,
-# #5435) and the real init cannot drift into describing different files.
+# them, both through these names. ``tests/unit/test_adopt_cmd.py`` holds the
+# two to one list in both directions, so a dry run (``bernstein adopt
+# --dry-run``, #5435) cannot silently under-report what init writes.
 INIT_WORKSPACE_CONFIG = ".sdd/config.yaml"
 INIT_RUNTIME_GITIGNORE = ".sdd/runtime/.gitignore"
 INIT_PROJECT_CONFIG = "bernstein.yaml"
