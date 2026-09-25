@@ -15,7 +15,7 @@
 > *"To achieve great things, two things are needed: a plan and not quite enough time."* - [attributed to](https://quoteinvestigator.com/2020/08/19/plan-time/) Leonard Bernstein
 
 ### il layer di governance open source per agenti IA
-<!-- l10n: en="the open-source governance layer for AI agents" hash="sha256:62785f3e7464" -->
+<!-- l10n: en="the open-source governance layer for AI agents" hash="sha256:13f9153b6acd" -->
 
 [![CI](https://github.com/sipyourdrink-ltd/bernstein/actions/workflows/ci.yml/badge.svg)](https://github.com/sipyourdrink-ltd/bernstein/actions/workflows/ci.yml)
 [![PyPI](https://img.shields.io/pypi/v/bernstein)](https://pypi.org/project/bernstein/)
@@ -38,17 +38,17 @@
 
 > **Stato: beta.** Mantenuto da una sola persona, in sviluppo attivo. Il numero di versione conta i rilasci, non la maturità: le versioni minori possono modificare le interfacce. Fissa la versione per qualsiasi dipendenza critica; le regressioni vengono risolte rapidamente, [segnalale](https://github.com/sipyourdrink-ltd/bernstein/issues).
 
-Bernstein è il layer di governance open source per agenti IA. Funziona a policy as code: tu scrivi la policy - chi può fare cosa, cosa richiede approvazione, cosa va registrato - e Bernstein la applica e produce il registro verificabile. Uno scheduler deterministico - nessun modello nel loop di coordinamento - esegue gli agenti in parallelo, filtra ciò che producono con dei gate e registra ogni passo, così un run si può verificare a posteriori, offline, dai soli artefatti. Gli agenti CLI di codice funzionano subito (Claude Code, Codex, Gemini CLI e altri 40+), e lo stesso layer governa qualsiasi carico agentico: il deliverable può essere un diff, un report di ricerca, un dataset o un pacchetto di evidenze di audit. Profilo di installazione air-gap incluso. Apache-2.0.
+Bernstein è il layer di governance open source per agenti IA. Funziona a policy as code: tu scrivi la policy - chi può fare cosa, cosa richiede approvazione, cosa va registrato - e Bernstein la applica e produce il registro verificabile. Uno scheduler deterministico - nessun modello nel loop di coordinamento - esegue gli agenti in parallelo, filtra ciò che producono con dei gate e registra ogni passo, così un run si può verificare a posteriori, offline, dai soli artefatti. Gli agenti CLI di codice funzionano subito (Claude Code, Codex, Gemini CLI e altri 52+), e lo stesso layer governa qualsiasi carico agentico: il deliverable può essere un diff, un report di ricerca, un dataset o un pacchetto di evidenze di audit. Profilo di installazione air-gap incluso. Apache-2.0.
 
 ### in sintesi
-<!-- l10n: en="at a glance" hash="sha256:97aa8e70f076" -->
+<!-- l10n: en="at a glance" hash="sha256:5ebd34b9459d" -->
 
 Quattro elementi lo contraddistinguono; tutto il resto sono dettagli.
 
 - **Nessun LLM nel ciclo di coordinamento.** La pianificazione è in puro Python, rendendo ogni esecuzione riproducibile da cima a fondo. Riproduci il piano di ieri e otterrai esattamente il grafo delle attività di ieri.
 - **Verificabile a posteriori.** Il giornale di replay registra ogni esecuzione, e la colonna vertebrale di lineage sempre attiva memorizza ogni passaggio dotato di tracciabilità; il log di audit opzionale concatenato con HMAC (`BERNSTEIN_AUDIT=1`) aggiunge ricevute verificabili offline. Il non determinismo emerge come discrepanza di hash nel passaggio esatto, non come riesecuzione intermittente. I deliverable non costituiti da codice ricevono lo stesso trattamento: un task può dichiarare un contratto di artefatto (report, dataset, log di azioni, risultati ops) e si conclude con una ricevuta di lineage firmata anziché un commit git.
 - **Isolato per progettazione.** Ogni task di codifica ottiene il proprio git worktree protetto da merge gate; i task in modalità artefatto ottengono una directory di lavoro in `.sdd/workspaces/`. Gli agenti non condividono alcuno spazio di lavoro modificabile per impostazione predefinita; l'unico stato condiviso è il backlog dei task, acquisito in modo atomico. Restrizioni più severe sul filesystem sono opzionali, fornite dai [backend sandbox](https://github.com/sipyourdrink-ltd/bernstein/blob/main/docs/architecture/sandbox.md). Disattivando i worktree, ogni task viene eseguito nel checkout condiviso.
-- **Ampio e locale.** Oltre 40 adapter per agenti CLI più un wrapper generico `--prompt`, stato basato su file, nessun passaggio SaaS, nessun piano dati di terze parti.
+- **Ampio e locale.** Oltre 52 adapter per agenti CLI più un wrapper generico `--prompt`, stato basato su file, nessun passaggio SaaS, nessun piano dati di terze parti.
 
 L'elenco completo è disponibile nella [pagina delle funzionalità](https://github.com/sipyourdrink-ltd/bernstein/blob/main/docs/reference/capabilities.md); la [matrice delle caratteristiche](https://github.com/sipyourdrink-ltd/bernstein/blob/main/docs/reference/FEATURE_MATRIX.md) costituisce l'indice esaustivo.
 
@@ -223,9 +223,9 @@ Lo stato di esecuzione salva un checkpoint in `.sdd/runs/<run_id>/` a ogni nodo.
 Gate di igiene del repository: `bernstein readme-l10n verify` blocca le PR i cui README tradotti divergono dalla versione inglese (indicando la sezione obsoleta), mentre `bernstein readme-l10n sync` aggiorna i collegamenti dopo modifiche al testo inglese. Consulta [readme-l10n](https://github.com/sipyourdrink-ltd/bernstein/blob/main/docs/playbooks/readme-l10n.md).
 
 ### agenti supportati
-<!-- l10n: en="supported agents" hash="sha256:237685a67917" -->
+<!-- l10n: en="supported agents" hash="sha256:6a62582765f7" -->
 
-Claude Code, Codex CLI, Gemini CLI, GitHub Copilot CLI, Cursor, Aider, Goose, Muse Code, OpenAI Agents SDK, Amp, Cody, Continue, Devin Terminal, Junie, Kilo, Kiro, AWS Q Developer, Ollama, OpenCode, OpenHands, Open Interpreter, gptme, Plandex, AIChat, Letta Code, Qwen e altri ancora. L'[indice degli adapter](https://github.com/sipyourdrink-ltd/bernstein/blob/main/docs/adapters/index.md) contiene i comandi di installazione per 30 di essi. `bernstein integrations list` elenca tutte le 54 integrazioni collegate da `src/bernstein/adapters/registry.py`, unica fonte di verità. 52 sono adapter per agenti selezionabili; le altre due righe corrispondono allo stub di test `mock` e al profilo endpoint `self-hosted-endpoints`. Qualsiasi altro strumento dotato di flag `--prompt` funziona tramite il wrapper generico.
+Claude Code, Codex CLI, Gemini CLI, GitHub Copilot CLI, Cursor, Aider, Goose, Muse Code, OpenAI Agents SDK, Amp, Cody, Continue, Devin Terminal, Junie, Kilo, Kiro, AWS Q Developer, Ollama, OpenCode, OpenHands, Open Interpreter, gptme, Plandex, AIChat, Letta Code, Qwen e altri ancora. L'[indice degli adapter](https://github.com/sipyourdrink-ltd/bernstein/blob/main/docs/adapters/index.md) contiene i comandi di installazione per 30 di essi. `bernstein integrations list` elenca tutte le 56 integrazioni collegate da `src/bernstein/adapters/registry.py`, unica fonte di verità. 54 sono adapter per agenti selezionabili; le altre due righe corrispondono allo stub di test `mock` e al profilo endpoint `self-hosted-endpoints`. Qualsiasi altro strumento dotato di flag `--prompt` funziona tramite il wrapper generico.
 
 Combina agenti diversi nella stessa esecuzione: modelli locali economici per il codice boilerplate, modelli cloud più potenti per le scelte architetturali. `bernstein integrations list --installed` mostra gli strumenti disponibili sul tuo sistema.
 
@@ -242,7 +242,7 @@ bernstein volunteer browse --budget 60
 La [guida del donatore](https://github.com/sipyourdrink-ltd/bernstein/blob/main/docs/volunteer/donor-guide.md) copre l'esecuzione di un worker e il budget che imposti, la [guida del progetto](https://github.com/sipyourdrink-ltd/bernstein/blob/main/docs/volunteer/project-guide.md) copre la dichiarazione di un manifesto, e il [modello delle minacce](https://github.com/sipyourdrink-ltd/bernstein/blob/main/docs/volunteer/threat-model.md) indica cosa ciascun confine protegge e cosa no. L'esecutore a comando singolo non è ancora rilasciato: oggi `verify`, `browse` e `hub` sono i sottocomandi funzionanti.
 
 ### oltre la pagina principale
-<!-- l10n: en="beyond the front page" hash="sha256:7dc120ea1ae4" -->
+<!-- l10n: en="beyond the front page" hash="sha256:ebdf899bf20a" -->
 
 Tutte le informazioni approfondite sono disponibili sul [sito della documentazione](https://bernstein.readthedocs.io/):
 

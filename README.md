@@ -37,7 +37,7 @@
 
 > **Status: beta.** Solo-maintained, under active development. The version number counts releases, not maturity - minor versions may change interfaces. Pin the version for anything you depend on; regressions get fixed fast, [file them](https://github.com/sipyourdrink-ltd/bernstein/issues).
 
-Bernstein is the open-source governance layer for AI agents. It runs on policy as code: you write the policy - who may do what, what needs approval, what must be recorded - and Bernstein enforces it and produces the verifiable record. A deterministic scheduler - no model in the coordination loop - runs agents in parallel, gates what they produce, and records every step, so a run can be verified after the fact, offline, from the artifacts alone. CLI coding agents work out of the box (Claude Code, Codex, Gemini CLI, and 40+ more), and the same layer governs any agent workload: the deliverable can be a diff, a research report, a dataset, or an audit evidence pack. Air-gap install profile included. Apache-2.0.
+Bernstein is the open-source governance layer for AI agents. It runs on policy as code: you write the policy - who may do what, what needs approval, what must be recorded - and Bernstein enforces it and produces the verifiable record. A deterministic scheduler - no model in the coordination loop - runs agents in parallel, gates what they produce, and records every step, so a run can be verified after the fact, offline, from the artifacts alone. CLI coding agents work out of the box (Claude Code, Codex, Gemini CLI, and 52 more), and the same layer governs any agent workload: the deliverable can be a diff, a research report, a dataset, or an audit evidence pack. Air-gap install profile included. Apache-2.0.
 
 ### at a glance
 
@@ -46,7 +46,7 @@ Four things set it apart; everything after is detail.
 - **No LLM in the coordination loop.** Scheduling is plain Python, so a run is reproducible end to end. Replay yesterday's plan and get yesterday's task graph.
 - **Checkable after the fact.** The replay journal records every run, and the always-on lineage spine records every lineage-bearing step; the opt-in HMAC-chained audit log (`BERNSTEIN_AUDIT=1`) adds receipts you verify offline. Non-determinism surfaces as a hash mismatch at the exact step, not a flaky re-run. Non-code deliverables get the same treatment: a task can declare an artifact contract (report, dataset, action log, ops result) and completes on a signed lineage receipt rather than a git commit.
 - **Isolated by construction.** Each coding task gets its own git worktree behind merge gates; artifact-mode tasks get a working directory under `.sdd/workspaces/`. Agents share no mutable workspace by default; the only shared state is the task backlog, which is claimed atomically. Stricter filesystem enforcement is opt-in, from the [sandbox backends](https://github.com/sipyourdrink-ltd/bernstein/blob/main/docs/architecture/sandbox.md). Disable worktrees and every task runs in the shared checkout.
-- **Broad and local.** 40+ CLI agent adapters plus a generic `--prompt` wrapper, file-based state, no SaaS hop, no third-party data plane.
+- **Broad and local.** 52 selectable CLI agent adapters plus a generic `--prompt` wrapper, file-based state, no SaaS hop, no third-party data plane.
 
 The full list is on the [capabilities page](https://github.com/sipyourdrink-ltd/bernstein/blob/main/docs/reference/capabilities.md); the [feature matrix](https://github.com/sipyourdrink-ltd/bernstein/blob/main/docs/reference/FEATURE_MATRIX.md) is the exhaustive index.
 
@@ -217,7 +217,7 @@ Repository hygiene gates: `bernstein readme-l10n verify` fails a PR whose transl
 
 ### supported agents
 
-Claude Code, Codex CLI, Gemini CLI, GitHub Copilot CLI, Cursor, Aider, Goose, Muse Code, OpenAI Agents SDK, Amp, Cody, Continue, Devin Terminal, Junie, Kilo, Kiro, AWS Q Developer, Ollama, OpenCode, OpenHands, Open Interpreter, gptme, Plandex, AIChat, Letta Code, Qwen, and more. The [adapter index](https://github.com/sipyourdrink-ltd/bernstein/blob/main/docs/adapters/index.md) carries install commands for 30 of them. `bernstein integrations list` enumerates all 54 wired-in integrations from `src/bernstein/adapters/registry.py`, the single source of truth for what resolves. 52 of them are selectable agent adapters; the other two rows are the `mock` test stub and the `self-hosted-endpoints` endpoint profile. Anything else with a `--prompt` flag works through the generic wrapper.
+Claude Code, Codex CLI, Gemini CLI, GitHub Copilot CLI, Cursor, Aider, Goose, Muse Code, OpenAI Agents SDK, Amp, Cody, Continue, Devin Terminal, Junie, Kilo, Kiro, AWS Q Developer, Ollama, OpenCode, OpenHands, Open Interpreter, gptme, Plandex, AIChat, Letta Code, Qwen, and more. The [adapter index](https://github.com/sipyourdrink-ltd/bernstein/blob/main/docs/adapters/index.md) carries install commands for 30 of them. `bernstein integrations list` enumerates all 56 wired-in integrations from `src/bernstein/adapters/registry.py`, the single source of truth for what resolves. 54 of them are selectable agent adapters; the other two rows are the `mock` test stub and the `self-hosted-endpoints` endpoint profile. Anything else with a `--prompt` flag works through the generic wrapper.
 
 Mix agents in the same run: cheap local models for boilerplate, heavier cloud models for architecture. `bernstein integrations list --installed` shows what is available on your machine.
 
@@ -239,6 +239,7 @@ Everything deep lives on the [docs site](https://bernstein.readthedocs.io/):
 | page | what it covers |
 |---|---|
 | [capabilities](https://github.com/sipyourdrink-ltd/bernstein/blob/main/docs/reference/capabilities.md) | the full capability list: MCP server mode, signed agent cards, sandbox backends, artifact sinks, regulatory mappings |
+| [MCP server](https://github.com/sipyourdrink-ltd/bernstein/blob/main/docs/mcp/server.md) | local stdio server, plus a hosted read-only endpoint at `mcp.bernstein.run` for receipt verification with no install; questions about this repo can be asked over MCP through [DeepWiki](https://deepwiki.com/sipyourdrink-ltd/bernstein) |
 | [who this is for](https://github.com/sipyourdrink-ltd/bernstein/blob/main/docs/use-cases.md) | where the value lands, and where Bernstein is the wrong tool |
 | [workflows](https://github.com/sipyourdrink-ltd/bernstein/blob/main/docs/operations/workflow-manifests.md) | declarative YAML DAGs of agent / command / loop nodes |
 | [web UI](https://github.com/sipyourdrink-ltd/bernstein/blob/main/docs/gui/index.md) | browser dashboard on the same API the TUI uses |

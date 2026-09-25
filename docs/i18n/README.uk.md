@@ -15,7 +15,7 @@
 > *"To achieve great things, two things are needed: a plan and not quite enough time."* - [attributed to](https://quoteinvestigator.com/2020/08/19/plan-time/) Leonard Bernstein
 
 ### опенсорсний governance-шар для AI-агентів
-<!-- l10n: en="the open-source governance layer for AI agents" hash="sha256:62785f3e7464" -->
+<!-- l10n: en="the open-source governance layer for AI agents" hash="sha256:13f9153b6acd" -->
 
 [![CI](https://github.com/sipyourdrink-ltd/bernstein/actions/workflows/ci.yml/badge.svg)](https://github.com/sipyourdrink-ltd/bernstein/actions/workflows/ci.yml)
 [![PyPI](https://img.shields.io/pypi/v/bernstein)](https://pypi.org/project/bernstein/)
@@ -38,17 +38,17 @@
 
 > **Статус: бета.** Підтримується однією людиною, в активній розробці. Номер версії рахує релізи, а не зрілість — мінорні версії можуть змінювати інтерфейси. Фіксуйте версію для всього, від чого залежите; регресії виправляються швидко, [повідомляйте про них](https://github.com/sipyourdrink-ltd/bernstein/issues).
 
-Bernstein — опенсорсний governance-шар для AI-агентів. Працює на policy as code: ти пишеш політику — хто що може робити, що потребує погодження, що має фіксуватися — а Bernstein застосовує її і формує запис, який можна перевірити. Детермінований планувальник — без моделі в циклі координації — запускає агентів паралельно, перевіряє результат на гейтах і записує кожен крок, тож запуск можна верифікувати постфактум, офлайн, лише за артефактами. CLI-агенти для коду працюють з коробки (Claude Code, Codex, Gemini CLI і ще 40+), і той самий шар говернить будь-яке агентне навантаження: результатом може бути диф, дослідницький звіт, датасет або пакет аудиторських свідчень. Профіль установки для air-gap у комплекті. Apache-2.0.
+Bernstein — опенсорсний governance-шар для AI-агентів. Працює на policy as code: ти пишеш політику — хто що може робити, що потребує погодження, що має фіксуватися — а Bernstein застосовує її і формує запис, який можна перевірити. Детермінований планувальник — без моделі в циклі координації — запускає агентів паралельно, перевіряє результат на гейтах і записує кожен крок, тож запуск можна верифікувати постфактум, офлайн, лише за артефактами. CLI-агенти для коду працюють з коробки (Claude Code, Codex, Gemini CLI і ще 52+), і той самий шар говернить будь-яке агентне навантаження: результатом може бути диф, дослідницький звіт, датасет або пакет аудиторських свідчень. Профіль установки для air-gap у комплекті. Apache-2.0.
 
 ### короткий огляд
-<!-- l10n: en="at a glance" hash="sha256:97aa8e70f076" -->
+<!-- l10n: en="at a glance" hash="sha256:5ebd34b9459d" -->
 
 Чотири речі виділяють його з-поміж інших; решта — деталі.
 
 - **Жодних LLM у циклі координації.** Планування здійснюється чистою мовою Python, тому виконання є повністю відтворюваним від початку до кінця. Відтворіть учорашній план і отримайте вчорашній граф завдань.
 - **Перевірка постфактум.** Журнал відтворення записує кожне виконання, а завжди активний хребет походження (lineage spine) фіксує кожен крок, що несе історію походження; опціональний журнал аудиту, зв'язаний через HMAC (`BERNSTEIN_AUDIT=1`), додає квитанції (receipts), які можна верифікувати офлайн. Недетермінізм виявляється як розбіжність хешу на конкретному кроці, а не як нестабільність повторного запуску. Результати, що не є кодом, проходять таку саму перевірку: завдання може оголосити контракт на артефакт (звіт, набір даних, журнал дій, результат операцій) і завершується підписаною квитанцією походження замість git-коміту.
 - **Ізольованість за конструкцією.** Кожне завдання з кодування отримує власний git worktree за гейтами злиття; завдання в режимі артефактів отримують робочий каталог у `.sdd/workspaces/`. За замовчуванням агенти не мають спільного змінного робочого простору; єдиним спільним станом є беклог завдань, що резервується атомарно. Більш суворі обмеження файлової системи є опціональними завдяки [бекендам пісочниці](https://github.com/sipyourdrink-ltd/bernstein/blob/main/docs/architecture/sandbox.md). Якщо вимкнути worktree, кожне завдання виконуватиметься у спільному робочому каталозі.
-- **Широкий та локальний.** Понад 40 адаптерів для CLI-агентів плюс універсальна обгортка `--prompt`, стан на основі файлів, без проміжних SaaS-сервісів, без сторонніх платформ обробки даних.
+- **Широкий та локальний.** Понад 52 адаптерів для CLI-агентів плюс універсальна обгортка `--prompt`, стан на основі файлів, без проміжних SaaS-сервісів, без сторонніх платформ обробки даних.
 
 Повний список наведено на [сторінці можливостей](https://github.com/sipyourdrink-ltd/bernstein/blob/main/docs/reference/capabilities.md); [матриця функцій](https://github.com/sipyourdrink-ltd/bernstein/blob/main/docs/reference/FEATURE_MATRIX.md) є вичерпним покажчиком.
 
@@ -223,9 +223,9 @@ bernstein workflow resume <run_id>                    # picks up at the first no
 Гейти гігієни репозиторію: `bernstein readme-l10n verify` блокує PR, перекладені README якого відстали від англійського оригіналу (називаючи застарілий розділ), а `bernstein readme-l10n sync` оновлює зв'язки після змін в англійському тексті. Дивіться [readme-l10n](https://github.com/sipyourdrink-ltd/bernstein/blob/main/docs/playbooks/readme-l10n.md).
 
 ### підтримувані агенти
-<!-- l10n: en="supported agents" hash="sha256:237685a67917" -->
+<!-- l10n: en="supported agents" hash="sha256:6a62582765f7" -->
 
-Claude Code, Codex CLI, Gemini CLI, GitHub Copilot CLI, Cursor, Aider, Goose, Muse Code, OpenAI Agents SDK, Amp, Cody, Continue, Devin Terminal, Junie, Kilo, Kiro, AWS Q Developer, Ollama, OpenCode, OpenHands, Open Interpreter, gptme, Plandex, AIChat, Letta Code, Qwen та інші. [Індекс адаптерів](https://github.com/sipyourdrink-ltd/bernstein/blob/main/docs/adapters/index.md) містить команди встановлення для 30 з них. Команда `bernstein integrations list` перелічує всі 54 підключені інтеграції з файлу `src/bernstein/adapters/registry.py`, єдиного джерела істини. 52 з них — це доступні для вибору адаптери агентів; інші два рядки — тестова заглушка `mock` та профіль кінцевих точок `self-hosted-endpoints`. Будь-який інший інструмент із прапорцем `--prompt` працює через універсальну обгортку.
+Claude Code, Codex CLI, Gemini CLI, GitHub Copilot CLI, Cursor, Aider, Goose, Muse Code, OpenAI Agents SDK, Amp, Cody, Continue, Devin Terminal, Junie, Kilo, Kiro, AWS Q Developer, Ollama, OpenCode, OpenHands, Open Interpreter, gptme, Plandex, AIChat, Letta Code, Qwen та інші. [Індекс адаптерів](https://github.com/sipyourdrink-ltd/bernstein/blob/main/docs/adapters/index.md) містить команди встановлення для 30 з них. Команда `bernstein integrations list` перелічує всі 56 підключені інтеграції з файлу `src/bernstein/adapters/registry.py`, єдиного джерела істини. 54 з них — це доступні для вибору адаптери агентів; інші два рядки — тестова заглушка `mock` та профіль кінцевих точок `self-hosted-endpoints`. Будь-який інший інструмент із прапорцем `--prompt` працює через універсальну обгортку.
 
 Комбінуйте агентів в одному запуску: дешеві локальні моделі для шаблонного коду, потужніші хмарні моделі для архітектури. Команда `bernstein integrations list --installed` показує, що доступно на вашому комп'ютері.
 
@@ -242,7 +242,7 @@ bernstein volunteer browse --budget 60
 [Посібник донора](https://github.com/sipyourdrink-ltd/bernstein/blob/main/docs/volunteer/donor-guide.md) описує запуск воркера та бюджет, який ви задаєте, [посібник проєкту](https://github.com/sipyourdrink-ltd/bernstein/blob/main/docs/volunteer/project-guide.md) — оголошення маніфесту, а [модель загроз](https://github.com/sipyourdrink-ltd/bernstein/blob/main/docs/volunteer/threat-model.md) — що кожна межа захищає, а що ні. Запуск однією командою ще не випущено: сьогодні працюють підкоманди `verify`, `browse` та `hub`.
 
 ### за межами головної сторінки
-<!-- l10n: en="beyond the front page" hash="sha256:7dc120ea1ae4" -->
+<!-- l10n: en="beyond the front page" hash="sha256:ebdf899bf20a" -->
 
 Усі докладні відомості розміщено на [сайті документації](https://bernstein.readthedocs.io/):
 

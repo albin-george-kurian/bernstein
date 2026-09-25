@@ -97,6 +97,17 @@ plugins:
   - search:
       separator: '[\s\-\.]+'
   - social:
+      # Card image generation makes a live, unauthenticated request to
+      # fonts.google.com per build (material.plugins.social._fetch_font_from_google_fonts)
+      # to resolve the "Inter" theme font, and Read the Docs starts every
+      # build from a fresh container, so the plugin's on-disk cache never
+      # gets a chance to warm up: every single build re-hits Google Fonts.
+      # That endpoint began rejecting the shared RTD/CI build IPs, which is
+      # what took bernstein.readthedocs.io down. Disable card image
+      # generation so the build has no runtime network dependency; the
+      # plugin still emits the per-page meta description tags. Re-enable
+      # once the fonts are vendored into a committed cache_dir instead.
+      cards: false
       cards_layout_options:
         background_color: "#4a148c"
         color: "#ffffff"
@@ -189,6 +200,7 @@ nav:
           - DeepSeek V4: adapters/deepseek.md
           - Agy: adapters/agy.md
           - Antigravity: adapters/antigravity.md
+          - Deep-research agents: adapters/deep-research.md
           - Deferred adapters: adapter-deferred.md
           - Adapter operations: operations/adapters.md
           - Adapter security floor: adapters/security-floor.md
@@ -492,6 +504,7 @@ nav:
           - A2A message receipts: operations/a2a-message-receipts.md
           - A2A JSON-RPC server surface: operations/a2a-server.md
           - Datasources & query receipts: operations/datasources.md
+          - Batch pass receipts: operations/batch-receipts.md
           - Verifiable audit receipts: security/audit-receipt.md
           - Evidence envelope: security/evidence-envelope.md
           - Gate adjudication records: operations/gate-adjudication.md
@@ -542,6 +555,7 @@ nav:
           - Volunteer task runner: reference/volunteer-runner.md
           - Volunteer lease store: reference/volunteer-lease-store.md
           - MCP catalog: reference/mcp-catalog.md
+          - Published identifiers: reference/published-identifiers.md
           - MCP tool tiers: mcp/tool_tiers.md
       - Compatibility & limits:
           - Capabilities: reference/capabilities.md
@@ -553,6 +567,7 @@ nav:
       - Release notes:
           - Changelog: CHANGELOG.md
           - Unreleased: release-notes/unreleased.md
+          - v3.20.0: release-notes/v3.20.0.md
           - v3.19.2: release-notes/v3.19.2.md
           - v3.19.1: release-notes/v3.19.1.md
           - v3.19.0: release-notes/v3.19.0.md
@@ -689,6 +704,12 @@ nav:
           - Lineage v1: decisions/009-lineage-v1.md
           - Audit-chain default cost: decisions/010-audit-chain-default-cost.md
           - A model drafts, a human signs: decisions/011-model-drafts-human-signs.md
+          - Govern versus observe: decisions/012-govern-versus-observe.md
+          - Typed ingest contract: decisions/013-typed-ingest-contract.md
+          - Agent identity plane: decisions/014-agent-identity-plane.md
+          - Artifact contract completion: decisions/015-artifact-contract-completion.md
+          - TRACE conformance level: decisions/016-trace-conformance-level.md
+          - Receipt coverage gap: decisions/017-receipt-states-its-gap.md
   - Contribute:
       - contributing/index.md
       - Project pulse: project-pulse.md
